@@ -59,6 +59,21 @@ def main():
         # create environment
         env = gym.make(args_cli.task, cfg=env_cfg)
 
+        # COMMENT THIS OUT AFTER GETTING THE DAMN CAMERA PRIMS.
+        # from pxr import UsdGeom
+        # import omni.usd
+
+        # stage = omni.usd.get_context().get_stage()
+
+        # print("\n================ CAMERA PRIMS ================")
+
+        # for prim in stage.Traverse():
+        #     if prim.IsA(UsdGeom.Camera):
+        #         print("CAMERA:", prim.GetPath())
+
+        # print("==============================================\n")
+
+
         # print info (this is vectorized environment)
         print(f"[INFO]: Gym observation space: {env.observation_space}")
         print(f"[INFO]: Gym action space: {env.action_space}")

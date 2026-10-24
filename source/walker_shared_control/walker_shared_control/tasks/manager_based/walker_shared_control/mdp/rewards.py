@@ -1,27 +1,46 @@
-# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
-
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import torch
 
-from isaaclab.managers import SceneEntityCfg
-from isaaclab.utils.math import wrap_to_pi
 
-if TYPE_CHECKING:
-    from isaaclab.assets import Articulation
-    from isaaclab.envs import ManagerBasedRLEnv
+def track_target_velocity(
+    env,
+    target_velocity: float = 0.35,
+    sigma: float = 0.05,
+):
+    """Reward maintaining the desired walking velocity."""
+
+    robot = env.scene["robot"]
+    velocity = robot.data.root_link_lin_vel_b[:, 0]
+
+    error = (velocity - target_velocity) / sigma
+
+    return torch.exp(-torch.square(error))
 
 
-def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg) -> torch.Tensor:
-    """Penalize joint position deviation from a target value."""
-    # extract the used quantities (to enable type-hinting)
-    asset: Articulation = env.scene[asset_cfg.name]
-    # wrap the joint positions to (-pi, pi)
-    joint_pos = wrap_to_pi(asset.data.joint_pos[:, asset_cfg.joint_ids])
-    # compute the reward
-    return torch.sum(torch.square(joint_pos - target), dim=1)
+def voluntary_effort(
+    env,
+    force_scale: float = 20.0,
+):
+    """Penalty proportional to squared human interaction force."""
+
+    action_term = env.action_manager.get_term(
+        "admittance_damping"
+    )
+
+    force = action_term.human_force_voluntary
+
+    return -torch.square(force / force_scale)
+
+def overspeed(
+        env,
+        target_velocity: float = 0.35,
+        sigma: float = 0.10
+        ):
+    robot = env.scene["robot"]
+
+    velocity = robot.data.root_link_lin_vel_b[:, 0]
+    overspeed = torch.clamp(
+        velocity - target_velocity,
+        min=0.0,
+    )
+
+    return torch.square(overspeed / sigma)

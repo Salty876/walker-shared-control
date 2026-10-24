@@ -21,17 +21,22 @@ import importlib.metadata as metadata
 import os
 import sys
 import time
+import csv
 
 import gymnasium as gym
 import torch
 from packaging import version
 from rsl_rl.runners import DistillationRunner, OnPolicyRunner
+from pathlib import Path
+from datetime import datetime
 
 from isaaclab.envs import DirectMARLEnvCfg, DirectRLEnvCfg, ManagerBasedRLEnvCfg
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.seed import configure_seed
 from isaaclab.utils.string import list_intersection, string_to_callable
+import isaaclab.sim as sim_utils
+
 
 from isaaclab_rl.rsl_rl import (
     RslRlBaseRunnerCfg,
@@ -147,6 +152,28 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         # create isaac environment
         env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
+        # debug for ZED camera
+
+        # stage = sim_utils.get_current_stage()
+
+        # print("\n=== ZED PRIMS ===")
+
+        # for prim in stage.Traverse():
+        #     path = str(prim.GetPath())
+
+        #     if (
+        #         "ZED" in path
+        #         or "CameraLeft" in path
+        #         or "CameraRight" in path
+        #     ):
+        #         print(
+        #             path,
+        #             "type =",
+        #             prim.GetTypeName(),
+        #         )
+
+        # print("=================\n")
+
         # convert to single-agent instance if required by the RL algorithm
         if isinstance(env.unwrapped.cfg, DirectMARLEnvCfg):
             from isaaclab.envs import multi_agent_to_single_agent
@@ -217,6 +244,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         # reset environment
         obs = env.get_observations()
         timestep = 0
+
+
+
+        eval_step = 0
+
+
+
         # simulate environment
         try:
             while True:

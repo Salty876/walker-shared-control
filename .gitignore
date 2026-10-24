@@ -88,3 +88,19 @@ _build
 
 # Superpowers (Claude Code plugin artifacts)
 docs/superpowers/
+
+# Any image or CSV
+*.csv
+*.jpeg
+*.png
+*.zip
+
+# Hide the plots
+/eval_logs
+/eval_plots
+/eval_plots_multiseed
+/eval_plots_multiseed_shifted
+/eval_plots_multiseed_shifted_camera
+/v2_plots
+/v3_plots
+zed_debug.txt
