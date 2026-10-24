@@ -386,7 +386,7 @@ Safety / validity supervisor
 Conventional admittance controller
 ```
 
-## Limitations
+## Limitations 
 
 The reported results are currently based on simulation.
 
