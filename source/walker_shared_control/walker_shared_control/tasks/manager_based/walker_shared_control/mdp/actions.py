@@ -291,15 +291,6 @@ class AdmittanceDampingAction(ActionTerm):
         slope_ahead = camera_perception.slope_ahead_camera_safe(self._env)[0, 0]
         raw = camera_perception.slope_ahead_camera(self._env)[0, 0]
         if self.debug_counter % 25 == 0:
-            # print(
-            #     f"[HUMAN V2] "
-            #     f"v={v_actual[0].item():.3f} | "
-            #     f"Fdes={force_desired[0].item():.2f} | "
-            #     f"Fvol={self._human_force_voluntary[0].item():.2f} | "
-            #     f"Fgait={self._human_force_gait[0].item():+.2f} | "
-            #     f"Ftotal={self._human_force[0].item():.2f} | "
-            #     f"B={self._B_drive[0].item():.2f}"
-            # )
             print(f"ZED SLOPE:{slope_ahead}");
             print(f"ZED RAW:{raw}")
 
@@ -339,34 +330,6 @@ class AdmittanceDampingAction(ActionTerm):
 
         v = self._asset.data.root_link_lin_vel_b[0, 0]
 
-
-        # if self.debug_counter % 25 == 0:
-            # slope_cam = camera_perception.slope_ahead_camera(self._env)
-            # slope_gt = walker_obs.slope_ahead(self._env)
-
-            # if torch.isfinite(slope_cam).all():
-            #     self._last_valid_slope_cam.copy_(slope_cam)
-            # else:
-            #     slope_cam = self._last_valid_slope_cam.clone()
-
-            # print(
-            #     f"[CAMERA DEBUG] x={x.item():.3f} m, "
-            #     f"slope_cam={torch.rad2deg(slope_cam).item():.1f} deg, "
-            #     f"slope_gt={torch.rad2deg(slope_gt).item():.1f} deg"
-            # )
-
-            # camera = self._env.scene["camera"]
-            # robot = self._env.scene["robot"]
-
-            # cam_pos = camera.data.pos_w.torch[0]
-            # robot_pos = robot.data.root_pos_w.torch[0]
-
-            # print(
-            #     f"robot_x={robot_pos[0].item():.3f}, "
-            #     f"camera_x={cam_pos[0].item():.3f}, "
-            #     f"dx={(cam_pos[0] - robot_pos[0]).item():.3f}"
-            # )
-
         slope_now = walker_obs.slope_now(self._env)[0, 0]
         slope_ahead = camera_perception.slope_ahead_camera_safe(self._env)[0, 0]
         slope_oracle = walker_obs.slope_ahead(self._env)[0, 0]
@@ -375,77 +338,7 @@ class AdmittanceDampingAction(ActionTerm):
         
 
         if not self._camera_debug_printed:
-
-            # points = camera_perception.depth_to_base_points(self._env)
-
-            # print("\n=== POINT CLOUD DEBUG ===")
-            # print("Number of points:", points.shape[0])
-
-            # print(
-            #     "X forward:",
-            #     points[:, 0].min().item(),
-            #     points[:, 0].max().item(),
-            # )
-
-            # print(
-            #     "Y lateral:",
-            #     points[:, 1].min().item(),
-            #     points[:, 1].max().item(),
-            # )
-
-            # print(
-            #     "Z height:",
-            #     points[:, 2].min().item(),
-            #     points[:, 2].max().item(),
-            # )
-
-            # print("=========================\n")
-
-            # camera_perception.debug_terrain_profile(self._env)
-
-
-            # camera = self._env.scene["camera"]
-            # mx = camera.data.intrinsic_matrices.torch
-            # # intrinsic matrices
-            # print("\n=== CAMERA INTRINSICS ===")
-            # print(mx)
-            # print("shape:", mx.shape)
-            # print("=============================")
-
-            # depth_wp = camera.data.output["distance_to_image_plane"]
-
-            # depth = wp.to_torch(depth_wp)
-
-            # depth_img = depth[0, :, :, 0]
-
-            # finite = torch.isfinite(depth_img)
-
-            # if finite.any():
-            #     print("Finite min:", depth_img[finite].min().item())
-            #     print("Finite max:", depth_img[finite].max().item())
-            #     print("Finite mean:", depth_img[finite].mean().item())
-
-            # vis = depth_img.clone()
-
-            # vis[~finite] = 5.0  # Set non-finite values to a specific value for visualization
-
-            # vis = torch.clamp(vis, 0.0, 5.0)  # Clamp values for better visualization
-
-            # vis = (vis / 5.0 * 255).to(torch.uint8).to(torch.uint8)
-
-            # vis_np = vis.cpu().numpy()
-
-            # vis_np = 255 - vis_np  # Invert for better visualization
-
-            # cv2.imwrite(f"depth_debug.png", vis_np)
-            # print("Saved depth image to depth_debug.png")
-
-            # print("\n=== CAMERA DEBUG ===")
-            # print("Depth shape:", depth.shape)
-            # print("Depth dtype:", depth.dtype)
-            # print("Depth device:", depth.device)
-            # print("Depth min:", depth.min().item())
-            # print("Depth max:", depth.max().item())
+            
             self._camera_debug_printed = True
 
             s = camera_perception.slope_ahead_camera(self._env)
@@ -487,18 +380,6 @@ class AdmittanceDampingAction(ActionTerm):
                 print(f"[INFO] Logged {self.eval_step} evaluation steps.")
                 print(f"ZED SLOPE:{slope_ahead}");
 
-                # More zed debug
-                
-
-
-            # print(
-            #     f"x={x.item():.3f} "
-            #     f"v={v.item():.3f} "
-            #     f"F={self._human_force[0].item():.2f} "
-            #     f"B={self._B_drive[0].item():.1f}"
-            #     f" slope_now={torch.rad2deg(slope_now).item():.1f} "
-            #     f" slope_ahead={torch.rad2deg(slope_ahead).item():.1f}"
-            # )
 
     def reset(self, env_ids=None):
         self.controller.reset(env_ids)

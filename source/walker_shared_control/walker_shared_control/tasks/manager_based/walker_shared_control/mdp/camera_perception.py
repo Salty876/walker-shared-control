@@ -258,27 +258,6 @@ def debug_terrain_profile(env):
         device=x.device,
     )
 
-    # print("\n=== TERRAIN PROFILE ===")
-
-    # for i in range(len(bin_edges) - 1):
-    #     x0 = bin_edges[i]
-    #     x1 = bin_edges[i + 1]
-
-    #     bin_mask = (x >= x0) & (x < x1)
-
-    #     if bin_mask.sum() >= 10:
-    #         z_median = torch.median(z[bin_mask])
-
-    #         center = (x0 + x1) / 2
-
-    #         print(
-    #             f"x={center.item():.2f} m   "
-    #             f"z={z_median.item():.3f} m   "
-    #             f"n={bin_mask.sum().item()}"
-    #         )
-
-    # print("=======================\n")
-
 
 def slope_ahead_camera_safe(env):
     """
